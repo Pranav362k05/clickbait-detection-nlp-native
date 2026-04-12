@@ -231,24 +231,3 @@ Result   : 🟢 NOT CLICKBAIT
 | `streamlit`    | Web interface                        |
 
 ---
-
-## 📝 Notes for Viva
-
-1. **Why not use deep learning?**
-   Traditional ML with TF-IDF is interpretable, fast, and performs excellently
-   on binary text classification. Deep learning adds complexity without
-   significant gains for this task.
-
-2. **Why stratify the train/test split?**
-   Stratification ensures both sets have the same class ratio (50% clickbait,
-   50% not), preventing misleading accuracy scores on imbalanced subsets.
-
-3. **What does the confusion matrix tell you?**
-   - True Positives: Correctly caught clickbait
-   - True Negatives: Correctly identified real news
-   - False Positives: Real news wrongly labeled as clickbait (annoying)
-   - False Negatives: Missed clickbait (more harmful — slips through)
-
-4. **Which metric matters most?**
-   F1-Score — it balances precision and recall, making it ideal when both
-   false positives and false negatives have real consequences.
