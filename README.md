@@ -3,9 +3,10 @@
 A complete Machine Learning project that detects clickbait news headlines using
 Natural Language Processing (NLP) techniques.
 
-# [🔥👉 Check out my project poster to understand it easier and better!](https://pranav362k05.github.io/clickbait-detection-nlp-native/)
+# 🔗👉 Check out my project poster & demo to understand it easier and better!
 
-**Project Poster:** https://pranav362k05.github.io/clickbait-detection-nlp-native/
+**📊 Poster:** https://pranav362k05.github.io/clickbait-detection-nlp-native/
+**🚀 Demo:** https://clickbait-detection-pranav-krishna.streamlit.app/
 
 ---
 
