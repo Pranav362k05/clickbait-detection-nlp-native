@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clickbait Headline Detection — Academic Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0a0a12;
+    --paper: #f5f3ee;
+    --accent1: #1a3fff;   /* electric blue */
+    --accent2: #ff3b3b;   /* red */
+    --accent3: #00c98d;   /* teal */
+    --accent4: #ffb800;   /* amber */
+    --accent5: #9b5de5;   /* violet */
+    --mid: #2d2d3a;
+    --soft: #e8e5de;
+    --rule: rgba(10,10,18,0.12);
+  }
+
+  @page {
+    size: A3 portrait;
+    margin: 0;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    width: 297mm;
+    min-height: 420mm;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────── */
+  .header {
+    background: var(--ink);
+    color: #fff;
+    padding: 28px 36px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 18px,
+      rgba(26,63,255,.08) 18px,
+      rgba(26,63,255,.08) 19px
+    );
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+  .header-badge {
+    background: var(--accent1);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .title-block { flex: 1; }
+  .title-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .poster-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 38px;
+    line-height: 1.07;
+    letter-spacing: -.02em;
+    color: #fff;
+  }
+  .poster-title span { color: var(--accent1); }
+  .header-meta {
+    display: flex; gap: 32px; margin-top: 18px; flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,.12);
+    padding-top: 14px;
+  }
+  .meta-item { display: flex; flex-direction: column; }
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: .18em; text-transform: uppercase;
+    color: rgba(255,255,255,.4); margin-bottom: 2px;
+  }
+  .meta-val { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,.92); }
+  .srm-logo-area {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    padding: 10px 16px;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+  .srm-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent1), var(--accent5));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 13px; color: #fff;
+  }
+  .srm-text { font-size: 9.5px; line-height: 1.5; color: rgba(255,255,255,.7); }
+  .srm-text strong { color: #fff; display: block; font-size: 11px; }
+
+  /* ─── LAYOUT GRID ─────────────────────────────────────── */
+  .poster-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  /* ─── SECTION BASE ────────────────────────────────────── */
+  .section {
+    padding: 20px 22px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .section:last-child, .section.no-border-r { border-right: none; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; letter-spacing: .22em; text-transform: uppercase;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 7px;
+  }
+  .section-label::before {
+    content: ''; display: inline-block;
+    width: 22px; height: 3px; border-radius: 2px; flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 17px; margin-bottom: 11px; line-height: 1.2;
+  }
+  .body-text { font-size: 11.5px; line-height: 1.65; color: #2a2a35; }
+
+  /* accent colors per section */
+  .s-intro .section-label { color: var(--accent1); }
+  .s-intro .section-label::before { background: var(--accent1); }
+  .s-obj .section-label { color: var(--accent3); }
+  .s-obj .section-label::before { background: var(--accent3); }
+  .s-data .section-label { color: var(--accent4); }
+  .s-data .section-label::before { background: var(--accent4); }
+  .s-method .section-label { color: var(--accent2); }
+  .s-method .section-label::before { background: var(--accent2); }
+  .s-models .section-label { color: var(--accent5); }
+  .s-models .section-label::before { background: var(--accent5); }
+  .s-results .section-label { color: #e04e00; }
+  .s-results .section-label::before { background: #e04e00; }
+  .s-conclusion .section-label { color: var(--accent1); }
+  .s-conclusion .section-label::before { background: var(--accent1); }
+
+  /* ─── INTRO ───────────────────────────────────────────── */
+  .s-intro { grid-column: 1 / 2; }
+  .callout {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    font-size: 11px;
+    line-height: 1.6;
+    font-style: italic;
+    position: relative;
+  }
+  .callout::before {
+    content: '"';
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    color: var(--accent1);
+    position: absolute; top: -6px; left: 10px;
+    line-height: 1;
+  }
+  .callout p { padding-left: 18px; }
+
+  /* ─── OBJECTIVE ───────────────────────────────────────── */
+  .s-obj { grid-column: 2 / 3; }
+  .obj-list { list-style: none; margin-top: 4px; }
+  .obj-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 9px 0; border-bottom: 1px solid var(--rule);
+    font-size: 11.5px; line-height: 1.55;
+  }
+  .obj-list li:last-child { border-bottom: none; }
+  .obj-num {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    font-weight: 500; color: var(--accent3);
+    background: rgba(0,201,141,.1);
+    border-radius: 4px; padding: 1px 6px;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ─── DATASET ─────────────────────────────────────────── */
+  .s-data { grid-column: 3 / 4; }
+  .dataset-card {
+    background: var(--soft);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 8px;
+  }
+  .dataset-stat {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; border-bottom: 1px solid var(--rule);
+    font-size: 11px;
+  }
+  .dataset-stat:last-child { border-bottom: none; padding-bottom: 0; }
+  .stat-key { color: #555; }
+  .stat-val {
+    font-family: 'DM Mono', monospace; font-weight: 500;
+    font-size: 12px; color: var(--ink);
+  }
+  .dataset-url {
+    margin-top: 10px;
+    background: rgba(255,184,0,.12);
+    border: 1px solid rgba(255,184,0,.4);
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    word-break: break-all;
+    color: #7a5c00;
+  }
+  .dataset-url span { display: block; color: #555; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 2px; }
+
+  /* ─── METHODOLOGY ─────────────────────────────────────── */
+  .s-method {
+    grid-column: 1 / 3;
+    background: var(--ink);
+    color: #fff;
+    border-right: 1px solid rgba(255,255,255,.08);
+  }
+  .s-method .section-title { color: #fff; }
+  .s-method .body-text { color: rgba(255,255,255,.7); }
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0;
+    margin-top: 14px; position: relative;
+  }
+  .pipe-step {
+    flex: 1; position: relative;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: 12px 10px 10px;
+    transition: background .2s;
+  }
+  .pipe-step + .pipe-step { margin-left: 8px; }
+  .pipe-arrow {
+    display: none;
+  }
+  .pipe-num {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: rgba(255,255,255,.3); margin-bottom: 5px;
+  }
+  .pipe-icon {
+    font-size: 22px; display: block; margin-bottom: 6px;
+  }
+  .pipe-name {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 11px; color: #fff; margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .pipe-desc { font-size: 9.5px; color: rgba(255,255,255,.55); line-height: 1.5; }
+  .pipe-step .pipe-tag {
+    display: inline-block; margin-top: 7px;
+    font-family: 'DM Mono', monospace; font-size: 8px;
+    padding: 2px 7px; border-radius: 3px; letter-spacing: .08em;
+  }
+
+  .step-1 { border-top: 3px solid var(--accent1); }
+  .step-1 .pipe-tag { background: rgba(26,63,255,.2); color: #7a9eff; }
+  .step-2 { border-top: 3px solid var(--accent4); }
+  .step-2 .pipe-tag { background: rgba(255,184,0,.2); color: #ffc740; }
+  .step-3 { border-top: 3px solid var(--accent3); }
+  .step-3 .pipe-tag { background: rgba(0,201,141,.2); color: #00e09c; }
+  .step-4 { border-top: 3px solid var(--accent2); }
+  .step-4 .pipe-tag { background: rgba(255,59,59,.2); color: #ff7878; }
+  .step-5 { border-top: 3px solid var(--accent5); }
+  .step-5 .pipe-tag { background: rgba(155,93,229,.2); color: #c49aff; }
+  .step-6 { border-top: 3px solid var(--accent3); }
+  .step-6 .pipe-tag { background: rgba(0,201,141,.2); color: #00e09c; }
+
+  /* ─── MODELS ──────────────────────────────────────────── */
+  .s-models { grid-column: 3 / 4; }
+  .model-card {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 9px;
+  }
+  .model-card:last-child { margin-bottom: 0; }
+  .model-header { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+  .model-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .model-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; }
+  .model-note { font-size: 10.5px; color: #444; line-height: 1.5; }
+  .model-best {
+    background: rgba(0,201,141,.08);
+    border: 1px solid rgba(0,201,141,.3);
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin-top: 5px;
+    font-size: 9.5px;
+    color: #007a53;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .model-best::before { content: '★'; }
+
+  /* ─── RESULTS ─────────────────────────────────────────── */
+  .s-results { grid-column: 1 / 3; }
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .results-table-wrap { }
+  .results-table {
+    width: 100%; border-collapse: collapse; font-size: 11.5px;
+  }
+  .results-table thead th {
+    background: var(--ink); color: #fff;
+    padding: 7px 10px; text-align: left;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 500;
+  }
+  .results-table thead th:first-child { border-radius: 6px 0 0 0; }
+  .results-table thead th:last-child { border-radius: 0 6px 0 0; }
+  .results-table tbody tr { border-bottom: 1px solid var(--rule); }
+  .results-table tbody tr:last-child { border-bottom: none; }
+  .results-table tbody td { padding: 8px 10px; }
+  .results-table tbody td:first-child { font-weight: 500; }
+  .metric-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .metric-bar {
+    height: 6px; border-radius: 3px; flex: 1;
+    background: var(--soft); overflow: hidden;
+  }
+  .metric-fill { height: 100%; border-radius: 3px; }
+  .fill-lr { background: var(--accent1); }
+  .fill-nb { background: var(--accent5); }
+  .metric-val { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: var(--ink); min-width: 44px; }
+  .winner-badge {
+    display: inline-block;
+    background: rgba(0,201,141,.15);
+    color: #007a53;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px; padding: 1px 6px; border-radius: 3px;
+    letter-spacing: .08em;
+  }
+
+  /* confusion matrix visual */
+  .cm-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; margin-bottom: 8px; }
+  .cm-wrap {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .cm-model-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: #777; margin-bottom: 3px;
+  }
+  .cm-grid {
+    display: grid; grid-template-columns: auto 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    gap: 3px; font-size: 9.5px;
+  }
+  .cm-ax { display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 8px; color: #666;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    padding-right: 3px; }
+  .cm-ax-h { display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 8px; color: #666; }
+  .cm-cell {
+    border-radius: 5px; padding: 7px 5px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+  }
+  .cm-cell .cn { font-size: 15px; font-weight: 500; }
+  .cm-cell .cl { font-size: 7.5px; color: rgba(0,0,0,.5); margin-top: 1px; }
+  .cm-tp { background: rgba(0,201,141,.2); }
+  .cm-fn { background: rgba(255,59,59,.12); }
+  .cm-fp { background: rgba(255,59,59,.12); }
+  .cm-tn { background: rgba(0,201,141,.2); }
+  .cm-section { display: flex; gap: 20px; }
+
+  /* ─── CONCLUSION ──────────────────────────────────────── */
+  .s-conclusion { grid-column: 3 / 4; }
+  .concl-item {
+    display: flex; gap: 11px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--rule);
+  }
+  .concl-item:last-child { border-bottom: none; }
+  .concl-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .concl-txt { font-size: 11px; line-height: 1.6; color: #2a2a35; }
+  .concl-txt strong { display: block; font-size: 11.5px; color: var(--ink); margin-bottom: 1px; }
+
+  /* ─── FOOTER ──────────────────────────────────────────── */
+  .footer {
+    background: var(--ink);
+    color: rgba(255,255,255,.5);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    padding: 10px 36px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 3px solid var(--accent1);
+  }
+  .footer-left { color: rgba(255,255,255,.7); }
+  .footer-dot { color: var(--accent1); margin: 0 8px; }
+
+  /* Full-width rows */
+  .full-row { grid-column: 1 / -1; }
+  .two-thirds { grid-column: 1 / 3; }
+  .one-third { grid-column: 3 / 4; }
+
+  /* Print */
+  @media print {
+    body { width: 297mm; }
+    .section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="title-block">
+        <span class="title-tag">▸ Natural Language Processing — 21CSE356T</span>
+        <h1 class="poster-title">Clickbait Headline<br><span>Detection</span> using NLP</h1>
+      </div>
+      <div class="srm-logo-area">
+        <img src="D:\SEM 6\NLP PE\clickbait headline detection code\srmlogo.png" alt="SRM Logo" style="width:58px;height:58px;object-fit:contain;">
+        <div class="srm-text">
+          <strong>SRM Institute of Science and Technology</strong>
+          Kattankulathur, Chennai
+        </div>
+      </div>
+      <div class="header-badge">Academic Poster</div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">Student Name</span>
+        <span class="meta-val">Pranav Krishna Y</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Register Number</span>
+        <span class="meta-val">RA2311003010863</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Course</span>
+        <span class="meta-val">Natural Language Processing — 21CSE356T</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Task</span>
+        <span class="meta-val">Clickbait Headline Detection</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Models</span>
+        <span class="meta-val">LR · Naive Bayes · SVM</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════ BODY GRID ══════════════════ -->
+<div class="poster-body">
+
+  <!-- ── 1. INTRODUCTION ── -->
+  <div class="section s-intro">
+    <div class="section-label">01 — Introduction</div>
+    <div class="section-title">What is Clickbait?</div>
+    <p class="body-text">
+      <strong>Clickbait</strong> refers to headlines engineered to provoke curiosity and compel clicks — often through sensationalism, vague promises, or emotional manipulation — while the actual content fails to deliver on the implied value.
+    </p>
+    <div class="callout">
+      <p>"You Won't Believe What This Celebrity Did Next!" is the archetypal clickbait — designed to trigger, not to inform.</p>
+    </div>
+    <p class="body-text" style="margin-top:11px;">
+      Detecting clickbait automatically is critical for:
+    </p>
+    <ul style="margin-top:7px; padding-left:0; list-style:none;">
+      <li style="display:flex;gap:7px;align-items:flex-start;padding:4px 0;font-size:11px;color:#2a2a35;">
+        <span style="color:var(--accent1);font-weight:700;flex-shrink:0;">→</span>
+        Improving news feed quality and user trust
+      </li>
+      <li style="display:flex;gap:7px;align-items:flex-start;padding:4px 0;font-size:11px;color:#2a2a35;">
+        <span style="color:var(--accent1);font-weight:700;flex-shrink:0;">→</span>
+        Fighting misinformation and low-quality journalism
+      </li>
+      <li style="display:flex;gap:7px;align-items:flex-start;padding:4px 0;font-size:11px;color:#2a2a35;">
+        <span style="color:var(--accent1);font-weight:700;flex-shrink:0;">→</span>
+        Training media literacy at scale via AI tools
+      </li>
+    </ul>
+  </div>
+
+  <!-- ── 2. OBJECTIVE ── -->
+  <div class="section s-obj">
+    <div class="section-label">02 — Objective</div>
+    <div class="section-title">Project Goals</div>
+    <ul class="obj-list">
+      <li>
+        <span class="obj-num">01</span>
+        <span>Build a <strong>binary text classifier</strong> that identifies news headlines as <em>clickbait</em> or <em>non-clickbait</em> with high accuracy using classical ML techniques.</span>
+      </li>
+      <li>
+        <span class="obj-num">02</span>
+        <span>Compare the performance of <strong>Logistic Regression</strong>, <strong>Naive Bayes</strong>, and <strong>SVM</strong> on TF-IDF-vectorised headline features.</span>
+      </li>
+      <li>
+        <span class="obj-num">03</span>
+        <span>Evaluate each model using <strong>Accuracy, Precision, Recall, and F1-score</strong>, then validate on real-world custom headlines.</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ── 3. DATASET ── -->
+  <div class="section s-data no-border-r">
+    <div class="section-label">03 — Dataset</div>
+    <div class="section-title">Kaggle Clickbait Dataset</div>
+    <div class="dataset-card">
+      <div class="dataset-stat">
+        <span class="stat-key">Source</span>
+        <span class="stat-val">Kaggle</span>
+      </div>
+      <div class="dataset-stat">
+        <span class="stat-key">Total Headlines</span>
+        <span class="stat-val">32,000</span>
+      </div>
+      <div class="dataset-stat">
+        <span class="stat-key">Clickbait (label=1)</span>
+        <span class="stat-val">15,999</span>
+      </div>
+      <div class="dataset-stat">
+        <span class="stat-key">Non-Clickbait (label=0)</span>
+        <span class="stat-val">16,001</span>
+      </div>
+      <div class="dataset-stat">
+        <span class="stat-key">Train / Test Split</span>
+        <span class="stat-val">80% / 20%</span>
+      </div>
+      <div class="dataset-stat">
+        <span class="stat-key">Features</span>
+        <span class="stat-val">headline, label</span>
+      </div>
+    </div>
+    <div class="dataset-url">
+      <span>Dataset URL</span>
+      kaggle.com/datasets/amananandrai/clickbait-dataset
+    </div>
+    <p class="body-text" style="margin-top:9px; font-size:10.5px;">
+      The dataset is <strong>perfectly balanced</strong> (~50/50 split), eliminating class-imbalance bias. Headlines were sourced from BuzzFeed (clickbait) and mainstream news outlets (non-clickbait).
+    </p>
+  </div>
+
+  <!-- ── 4. METHODOLOGY ── -->
+  <div class="section s-method two-thirds">
+    <div class="section-label" style="color:rgba(255,255,255,.5);">04 — Methodology</div>
+    <div class="section-title">NLP Pipeline</div>
+    <div class="pipeline">
+      <div class="pipe-step step-1">
+        <div class="pipe-num">STEP 01</div>
+        <span class="pipe-icon">📥</span>
+        <div class="pipe-name">Data Ingestion</div>
+        <div class="pipe-desc">Download dataset via Kaggle API; load into Pandas DataFrame and inspect class balance.</div>
+        <span class="pipe-tag">Kaggle · Pandas</span>
+      </div>
+      <div class="pipe-step step-2">
+        <div class="pipe-num">STEP 02</div>
+        <span class="pipe-icon">🧹</span>
+        <div class="pipe-name">Text Cleaning</div>
+        <div class="pipe-desc">Lowercase, strip URLs and punctuation, remove extra whitespace using regex.</div>
+        <span class="pipe-tag">re · string</span>
+      </div>
+      <div class="pipe-step step-3">
+        <div class="pipe-num">STEP 03</div>
+        <span class="pipe-icon">✂️</span>
+        <div class="pipe-name">Train/Test Split</div>
+        <div class="pipe-desc">Stratified 80/20 split ensures label proportions are preserved in both sets.</div>
+        <span class="pipe-tag">sklearn</span>
+      </div>
+      <div class="pipe-step step-4">
+        <div class="pipe-num">STEP 04</div>
+        <span class="pipe-icon">🔢</span>
+        <div class="pipe-name">TF-IDF Vectorisation</div>
+        <div class="pipe-desc">Top 5,000 unigram+bigram features weighted by term frequency–inverse document frequency.</div>
+        <span class="pipe-tag">TfidfVectorizer</span>
+      </div>
+      <div class="pipe-step step-5">
+        <div class="pipe-num">STEP 05</div>
+        <span class="pipe-icon">🤖</span>
+        <div class="pipe-name">Model Training</div>
+        <div class="pipe-desc">Logistic Regression and Naive Bayes trained; SVM included for comparison.</div>
+        <span class="pipe-tag">LR · NB · SVM</span>
+      </div>
+      <div class="pipe-step step-6">
+        <div class="pipe-num">STEP 06</div>
+        <span class="pipe-icon">📊</span>
+        <div class="pipe-name">Evaluation</div>
+        <div class="pipe-desc">Accuracy, Precision, Recall, F1-score and Confusion Matrix compared across models.</div>
+        <span class="pipe-tag">sklearn.metrics</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. MODELS ── -->
+  <div class="section s-models no-border-r">
+    <div class="section-label">05 — Models</div>
+    <div class="section-title">Classifiers Used</div>
+    <div class="model-card">
+      <div class="model-header">
+        <div class="model-dot" style="background:var(--accent1);"></div>
+        <div class="model-name">Logistic Regression</div>
+      </div>
+      <div class="model-note">Learns a weight per TF-IDF token. Words like "shocking" and "you won't believe" get high weights — directly interpretable. Outputs probability scores, not just binary labels.</div>
+      <div class="model-best">Best for interpretability & probability outputs</div>
+    </div>
+    <div class="model-card">
+      <div class="model-header">
+        <div class="model-dot" style="background:var(--accent5);"></div>
+        <div class="model-name">Naive Bayes</div>
+      </div>
+      <div class="model-note">Assumes feature independence; computes P(clickbait | words). Highly efficient on sparse TF-IDF matrices. Achieved slightly higher overall accuracy.</div>
+    </div>
+    <div class="model-card">
+      <div class="model-header">
+        <div class="model-dot" style="background:var(--accent4);"></div>
+        <div class="model-name">SVM (Linear)</div>
+      </div>
+      <div class="model-note">Finds maximum-margin hyperplane in high-dimensional TF-IDF space. Robust to overfitting in sparse text; strong baseline comparator.</div>
+    </div>
+  </div>
+
+  <!-- ── 6. RESULTS ── -->
+  <div class="section s-results two-thirds">
+    <div class="section-label">06 — Results &amp; Evaluation</div>
+    <div class="section-title">Model Performance</div>
+    <div class="results-grid">
+      <!-- Metrics Table -->
+      <div class="results-table-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Logistic Regression</th>
+              <th>Naive Bayes <span class="winner-badge">▲ Best</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Accuracy</td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-lr" style="width:95.03%"></div></div>
+                  <span class="metric-val">96.89%</span>
+                </div>
+              </td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-nb" style="width:95.41%"></div></div>
+                  <span class="metric-val">97.11%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Precision</td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-lr" style="width:95.06%"></div></div>
+                  <span class="metric-val">97.38%</span>
+                </div>
+              </td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-nb" style="width:95.41%"></div></div>
+                  <span class="metric-val">96.43%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Recall</td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-lr" style="width:95.03%"></div></div>
+                  <span class="metric-val">96.37%</span>
+                </div>
+              </td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-nb" style="width:95.41%"></div></div>
+                  <span class="metric-val">97.84%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>F1-Score</td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-lr" style="width:95.03%"></div></div>
+                  <span class="metric-val">96.87%</span>
+                </div>
+              </td>
+              <td>
+                <div class="metric-bar-wrap">
+                  <div class="metric-bar"><div class="metric-fill fill-nb" style="width:95.41%"></div></div>
+                  <span class="metric-val">97.13%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Sample predictions -->
+        <div style="margin-top:13px; background:var(--soft); border-radius:7px; padding:10px 12px;">
+          <div style="font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:#777;margin-bottom:7px;">Live Predictions (LR Model)</div>
+          <div style="font-size:10.5px;line-height:2;">
+            <span style="display:inline-block;background:rgba(0,201,141,.15);color:#005f38;border-radius:3px;padding:0 6px;margin-right:4px;font-family:'DM Mono',monospace;font-size:9px;">NOT CLICKBAIT 85.4%</span> Scientists discover new Alzheimer's treatment<br>
+            <span style="display:inline-block;background:rgba(255,59,59,.12);color:#c00;border-radius:3px;padding:0 6px;margin-right:4px;font-family:'DM Mono',monospace;font-size:9px;">CLICKBAIT 92.6%</span> You won't believe what this celebrity did next!<br>
+            <span style="display:inline-block;background:rgba(0,201,141,.15);color:#005f38;border-radius:3px;padding:0 6px;margin-right:4px;font-family:'DM Mono',monospace;font-size:9px;">NOT CLICKBAIT 96.9%</span> Government announces new budget for 2025<br>
+            <span style="display:inline-block;background:rgba(255,59,59,.12);color:#c00;border-radius:3px;padding:0 6px;margin-right:4px;font-family:'DM Mono',monospace;font-size:9px;">CLICKBAIT 97.4%</span> 10 shocking things doctors don't want you to know
+          </div>
+        </div>
+      </div>
+
+      <!-- Confusion Matrices -->
+      <div class="cm-section" 
+     style="display:flex;flex-direction:column;gap:20px;justify-content:center;align-items:center;">
+  
+  <img src="../clickbait_detector/clickbait_detector/plots/confusion_matrix_Logistic_Regression.png"
+       alt="Logistic Regression Confusion Matrix"
+       style="width:220px;height:auto;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.1);">
+
+  <img src="../clickbait_detector/clickbait_detector/plots/confusion_matrix_Naive_Bayes.png"
+       alt="Naive Bayes Confusion Matrix"
+       style="width:220px;height:auto;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.1);">
+
+</div>
+    </div>
+  </div>
+
+  <!-- ── 7. CONCLUSION ── -->
+  <div class="section s-conclusion no-border-r">
+    <div class="section-label">07 — Conclusion</div>
+    <div class="section-title">Key Takeaways</div>
+    <div class="concl-item">
+      <div class="concl-icon" style="background:rgba(0,201,141,.12);">🎯</div>
+      <div class="concl-txt">
+        <strong>High-Accuracy Results</strong>
+        Both models exceeded <strong>96% accuracy</strong> on 6,400 test headlines, validating that TF-IDF + classical ML is highly effective for headline-level clickbait detection.
+      </div>
+    </div>
+    <div class="concl-item">
+      <div class="concl-icon" style="background:rgba(155,93,229,.12);">🏆</div>
+      <div class="concl-txt">
+        <strong>Naive Bayes Wins Narrowly</strong>
+        Naive Bayes (97.11%) edged Logistic Regression (96.89%) across all four metrics, with notably fewer false negatives. Making it more reliable at catching real clickbait.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /poster-body -->
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="footer">
+  <span class="footer-left">Pranav Krishna Y <span class="footer-dot">·</span> RA2311003010863 <span class="footer-dot">·</span> NLP — 21CSE356T</span>
+  <span>SRM Institute of Science and Technology <span class="footer-dot">·</span> Clickbait Headline Detection using NLP</span>
+</footer>
+
+</body>
+</html>
