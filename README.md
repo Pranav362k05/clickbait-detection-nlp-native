@@ -175,6 +175,60 @@ Logistic Regression is ideal for this task because:
 - Weight of "shocking" = +0.8 → strongly predicts clickbait
 - Weight of "government" = -0.5 → strongly predicts legitimate news
 
+## 🤖 Why Naive Bayes?
+
+Naive Bayes is effective for this task because:
+
+| Reason | Explanation |
+|--------|-------------|
+| Works well with text data | Uses word frequencies/probabilities, which naturally fit NLP problems |
+| Handles high-dimensional data | Performs efficiently even with thousands of TF-IDF features |
+| Fast and lightweight | Requires very little computation and trains quickly |
+| Performs well on small datasets | Doesn’t need large amounts of data to generalize well |
+| Robust to irrelevant features | Less affected by noisy or unnecessary words |
+| Strong baseline model | Often gives surprisingly good performance in text classification |
+
+---
+
+### Example Interpretation
+
+Naive Bayes calculates probabilities like:
+
+P(clickbait | "shocking") > P(non-clickbait | "shocking")
+→ predicts Clickbait
+
+P(non-clickbait | "government") > P(clickbait | "government")
+→ predicts Not Clickbait
+
+
+---
+
+### How it works (Simple Explanation)
+
+Instead of learning weights like Logistic Regression, Naive Bayes calculates probabilities of words given a class.
+
+Example:
+
+Headline: "shocking secret revealed"
+
+P(clickbait) ∝
+P("shocking"|clickbait) ×
+P("secret"|clickbait) ×
+P("revealed"|clickbait)
+
+
+---
+
+### Key Idea
+
+Naive Bayes assumes that words are independent and combines their probabilities to make a prediction.
+
+---
+
+### One-Line Summary
+
+Naive Bayes works well because it directly models the probability of words belonging to each class, making it highly suitable for text classification tasks.
+
 ---
 
 ## 📈 Example Outputs
@@ -183,12 +237,12 @@ Logistic Regression is ideal for this task because:
 
 ```
 ==================================================
-  Results: Logistic Regression
+  Results: Naive Bayes
 ==================================================
-  Accuracy    : 0.9612
-  Precision   : 0.9587
-  Recall      : 0.9641
-  F1-Score    : 0.9614
+  Accuracy    : 0.9711
+  Precision   : 0.9643
+  Recall      : 0.9784
+  F1-Score    : 0.9713
 ==================================================
 
 Detailed Classification Report:
