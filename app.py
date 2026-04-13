@@ -273,9 +273,9 @@ elif page == "📊 Model Insights":
         st.stop()
 
     # ── Metric Cards ─────────────────────────────────────────────────────────
-    st.markdown("### 🏆 Best Model (Logistic Regression) Metrics")
+    st.markdown("### 🏆 Best Model (Naive Bayes) Metrics")
 
-    lr_metrics = all_metrics.get("Logistic Regression", {})
+    lr_metrics = all_metrics.get("Naive Bayes", {})
     col1, col2, col3, col4 = st.columns(4)
 
     for col, (metric, val) in zip([col1, col2, col3, col4], lr_metrics.items()):
@@ -355,7 +355,7 @@ elif page == "📊 Model Insights":
                 img_path = os.path.join(plots_dir, img_file)
                 model_label = img_file.replace("confusion_matrix_", "").replace(".png", "").replace("_", " ")
                 with col:
-                    st.image(img_path, caption=model_label, use_column_width=True)
+                    st.image(img_path, caption=model_label, use_container_width=True)
         else:
             st.info("No confusion matrix images found. Run `main.py` first.")
     else:
