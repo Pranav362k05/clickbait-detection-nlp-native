@@ -1,8 +1,11 @@
 # 🎯 Clickbait Headline Detection using NLP
 
 A complete Machine Learning project that detects clickbait news headlines using
-Natural Language Processing (NLP) techniques — built for VS Code, beginner-friendly,
-and fully explainable for a viva.
+Natural Language Processing (NLP) techniques.
+
+# 🔥👉 Check out my project poster to understand it easier and better!
+
+**Project Poster:** [Poster](https://pranav362k05.github.io/clickbait-detection-nlp-native/)
 
 ---
 
@@ -237,7 +240,7 @@ Naive Bayes works well because it directly models the probability of words belon
 
 ```
 ==================================================
-  Results: Naive Bayes
+  Results: Naive Bayes (Best)
 ==================================================
   Accuracy    : 0.9711
   Precision   : 0.9643
