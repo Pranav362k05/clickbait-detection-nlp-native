@@ -6,6 +6,7 @@ Natural Language Processing (NLP) techniques.
 # 🔗👉 Check out my project poster & demo to understand it easier and better!
 
 **📊 Poster:** https://pranav362k05.github.io/clickbait-detection-nlp-native/
+
 **🚀 Demo:** https://clickbait-detection-pranav-krishna.streamlit.app/
 
 ---
