@@ -3,16 +3,16 @@
 A complete Machine Learning project that detects clickbait news headlines using
 Natural Language Processing (NLP) techniques.
 
-# 🔥👉 Check out my project poster to understand it easier and better!
+# [🔥👉 Check out my project poster to understand it easier and better!](https://pranav362k05.github.io/clickbait-detection-nlp-native/)
 
-**Project Poster:** [Poster](https://pranav362k05.github.io/clickbait-detection-nlp-native/)
+**Project Poster:** https://pranav362k05.github.io/clickbait-detection-nlp-native/
 
 ---
 
 ## 📌 Project Overview
 
 Clickbait headlines are designed to manipulate readers into clicking a link by
-triggering curiosity, shock, or emotion — rather than informing them. Examples:
+triggering curiosity, shocks, or emotion — rather than informing them. Examples:
 
 - *"You Won't BELIEVE What She Did Next!"*
 - *"10 Shocking Secrets Doctors Are Hiding From You"*
